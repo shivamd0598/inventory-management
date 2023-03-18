@@ -7,6 +7,7 @@ import com.inventorymanagement.inventorymanagement.exception.CustomException;
 import com.inventorymanagement.inventorymanagement.repo.ImageRepo;
 import com.inventorymanagement.inventorymanagement.repo.ProductRepository;
 import com.inventorymanagement.inventorymanagement.service.ProductService;
+import com.inventorymanagement.inventorymanagement.util.ImageUtil;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,7 @@ public class ProductServiceImpl implements ProductService {
         ProductImage productImage=new ProductImage();
         productImage.setName(file.getOriginalFilename());
         productImage.setType(file.getContentType());
-        productImage.setImageData(file.getBytes());
+        productImage.setImageData(ImageUtil.compressImage(file.getBytes()));
         productImage.setProduct(product);
         imageRepo.save(productImage);
 
@@ -88,7 +89,7 @@ public class ProductServiceImpl implements ProductService {
     public byte[] downloadImage(long id, String fileName) {
         Product product=productRepository.findById(id).orElseThrow(()->new CustomException(String.format("Product with %s id not found",id),"PRODUCT_NOT_FOUND",404));
         Optional<ProductImage> productImage=imageRepo.findById(product.getId());
-        return productImage.get().getImageData();
+        return ImageUtil.decompressImage(productImage.get().getImageData());
     }
 
     public boolean reduceQuantity(long id,long quantity){
