@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface ProductService {
 
-    public long createProduct(ProductDto productDto, MultipartFile file) throws IOException;
+    public long createProduct(ProductDto productDto);
     public List<ProductDto> getAllProducts();
 
     public ProductDto getProductById(long id);
@@ -16,5 +16,8 @@ public interface ProductService {
     public ProductDto updateProduct(ProductDto productDto,long id);
 
     public void deleteProduct(long id);
+
+    public void uploadImage(long id, MultipartFile file) throws IOException;
+
     public byte[] downloadImage(long id,String fileName);
 }

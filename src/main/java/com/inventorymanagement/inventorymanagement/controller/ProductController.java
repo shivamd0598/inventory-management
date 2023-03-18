@@ -20,8 +20,8 @@ public class ProductController {
     ProductService productService;
 
     @PostMapping
-    public ResponseEntity<Long> createProduct(@RequestBody ProductDto productDto, @RequestParam MultipartFile file) throws IOException {
-        return new ResponseEntity<>(productService.createProduct(productDto,file), HttpStatus.CREATED);
+    public ResponseEntity<Long> createProduct(@RequestBody ProductDto productDto) throws IOException {
+        return new ResponseEntity<>(productService.createProduct(productDto), HttpStatus.CREATED);
     }
 
     @GetMapping
@@ -43,6 +43,11 @@ public class ProductController {
     public ResponseEntity<String> deleteProduct(@PathVariable(name = "id") long id){
         productService.deleteProduct(id);
         return new ResponseEntity<>("Product deleted successfully!!!",HttpStatus.OK);
+    }
+    @PostMapping("/{id}/upload")
+    public ResponseEntity<String> uploadImage(@PathVariable long id, @RequestParam("productImage") MultipartFile file) throws IOException {
+        productService.uploadImage(id,file);
+        return new ResponseEntity<>("Product image uploaded successfully!!!", HttpStatus.OK);
     }
     @GetMapping("/download/{id}/{fileName}")
     public ResponseEntity<byte[]> downloadImage(@PathVariable(name = "id") long id, @PathVariable(name = "fileName") String fileName){

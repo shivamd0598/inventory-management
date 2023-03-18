@@ -13,9 +13,10 @@ public class ProductImage {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(unique = true)
     private String name;
     private String type;
-    @Column(name = "imagedata")
+    @Column(name = "imagedata",columnDefinition = "LONGBLOB")
     private byte[] imageData;
     @ManyToOne
     private Product product;

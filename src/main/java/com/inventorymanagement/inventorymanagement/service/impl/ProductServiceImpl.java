@@ -31,7 +31,7 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository productRepository;
 
     @Override
-    public long createProduct(ProductDto productDto, MultipartFile file) throws IOException {
+    public long createProduct(ProductDto productDto){
       log.info("Saving Product....");
         Product product=Product.builder()
                         .name(productDto.getName())
@@ -41,12 +41,12 @@ public class ProductServiceImpl implements ProductService {
                         .build();
         product=productRepository.save(product);
 
-        ProductImage productImage=new ProductImage();
-        productImage.setName(file.getOriginalFilename());
-        productImage.setType(file.getContentType());
-        productImage.setImageData(ImageUtil.compressImage(file.getBytes()));
-        productImage.setProduct(product);
-        imageRepo.save(productImage);
+//        ProductImage productImage=new ProductImage();
+//        productImage.setName(file.getOriginalFilename());
+//        productImage.setType(file.getContentType());
+//        productImage.setImageData(ImageUtil.compressImage(file.getBytes()));
+//        productImage.setProduct(product);
+//        imageRepo.save(productImage);
 
         log.info("Product Created");
         return product.getId();
@@ -86,9 +86,22 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public void uploadImage(long id, MultipartFile file) throws IOException {
+        Product product=productRepository.findById(id).orElseThrow(()->new CustomException(String.format("Product with %s id not found",id),"PRODUCT_NOT_FOUND",404));
+
+        ProductImage productImage=new ProductImage();
+        productImage.setName(file.getOriginalFilename());
+        productImage.setType(file.getContentType());
+        productImage.setImageData(ImageUtil.compressImage(file.getBytes()));
+        productImage.setProduct(product);
+        imageRepo.save(productImage);
+
+    }
+
+    @Override
     public byte[] downloadImage(long id, String fileName) {
         Product product=productRepository.findById(id).orElseThrow(()->new CustomException(String.format("Product with %s id not found",id),"PRODUCT_NOT_FOUND",404));
-        Optional<ProductImage> productImage=imageRepo.findById(product.getId());
+        Optional<ProductImage> productImage= Optional.ofNullable(imageRepo.findByProduct(fileName, product.getId()));
         return ImageUtil.decompressImage(productImage.get().getImageData());
     }
 
